@@ -5,7 +5,8 @@ services:
       context: .
     environment:
       - OPENAI_API_KEY
-      - API_URL      
+      - API_URL
+      - REACT_APP_AGENT_PORT=${AGENT_PORT:-3000}
     ports:
       - ${AGENT_PORT:-3000}:8000
       - ${FRONTEND_PORT:-3005}:3000

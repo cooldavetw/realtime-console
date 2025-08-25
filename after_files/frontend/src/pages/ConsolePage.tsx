@@ -5,12 +5,6 @@
  *
  * Simply switch the lines by commenting one and removing the other
  */
-// Flowise Base URL
-const FLOWISE_BASE_URL = process.env.REACT_APP_FLOWISE_BASE_URL
-// Flowise API Key
-const FLOWISE_API_KEY = process.env.REACT_APP_FLOWISE_API_KEY
-
-const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY
 
 import { useEffect, useRef, useCallback, useState } from 'react'
 

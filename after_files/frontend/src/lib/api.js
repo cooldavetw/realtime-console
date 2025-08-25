@@ -9,7 +9,7 @@ export class RealtimeAPI extends RealtimeEventHandler {
    */
   constructor({ url, apiKey, dangerouslyAllowAPIKeyInBrowser, debug } = {}) {
     super();
-    this.defaultUrl = 'ws://192.168.66.24:8000';
+    this.defaultUrl = 'ws://' + window.location.hostname  + ':' + process.env.REACT_APP_AGENT_PORT;
     this.url = url || this.defaultUrl;
     this.apiKey = apiKey || null;
     this.debug = !!debug;
@@ -57,9 +57,6 @@ export class RealtimeAPI extends RealtimeEventHandler {
    * @returns {Promise<true>}
    */
   async connect({ model } = { model: 'gpt-4o-realtime-preview-2024-10-01' }) {
-    if (!this.apiKey && this.url === this.defaultUrl) {
-      console.warn(`No apiKey provided for connection to "${this.url}"`);
-    }
     if (this.isConnected()) {
       throw new Error(`Already connected`);
     }
@@ -121,7 +118,7 @@ export class RealtimeAPI extends RealtimeEventHandler {
       const moduleName = 'ws';
       const wsModule = await import(/* webpackIgnore: true */ moduleName);
       const WebSocket = wsModule.default;
-      const ws = new WebSocket('ws://192.168.66.24:8000');
+      const ws = new WebSocket('ws://' + window.location.hostname   + ':' + process.env.REACT_APP_AGENT_PORT);
       ws.on('message', (data) => {
           try {
               // 原始消息直通
