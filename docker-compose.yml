@@ -1,0 +1,11 @@
+services:
+  segma-realtime-console:
+    image: segma-realtime-consoles
+    build:
+      context: .
+    environment:
+      - OPENAI_API_KEY
+      - API_URL      
+    ports:
+      - ${AGENT_PORT:-3000}:8000
+      - ${FRONTEND_PORT:-3005}:3000

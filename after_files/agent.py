@@ -16,7 +16,9 @@ from openai import OpenAI
 #   export OPENAI_API_KEY="sk-..."
 client = OpenAI()  # uses env
 
-API_URL = "https://192.168.66.24/aibuilder/api/v1/prediction/7b9b4cad-35a2-45c6-8e5e-1b15c07a0b79"
+API_URL = os.getenv("API_URL")
+
+#API_URL = "https://192.168.66.24/aibuilder/api/v1/prediction/7b9b4cad-35a2-45c6-8e5e-1b15c07a0b79"
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Tell the server what we expect from the client.
