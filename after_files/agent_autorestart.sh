@@ -1,5 +1,5 @@
 while echo "Running"; do
-    python agent.py devs
+    python agent.py
     return_code=$?
     if (( return_code != 0 )); then
         echo "agent crashed with exit code $return_code. Respawning.." >>/var/log/agent.log
