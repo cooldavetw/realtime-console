@@ -1,6 +1,5 @@
 #!/bin/bash
 
-/agent_autorestart.sh &
-echo "agent started"
-cd /frontend
-npm start
+/frontend_autorestart.sh &
+echo "frontend started"
+python3 /agent.py 2>&1

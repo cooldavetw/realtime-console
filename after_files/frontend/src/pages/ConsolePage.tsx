@@ -7,22 +7,16 @@
  */
 
 import { useEffect, useRef, useCallback, useState } from 'react'
-
-import ReactMarkdown from 'react-markdown'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { okaidia } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { RealtimeClient } from '../lib/client.js'
 import { ItemType } from '../lib/client.js'
 import { WavRecorder, WavStreamPlayer } from '../lib/wavtools/index.js'
-import { instructions } from '../utils/transcription_config'
 import { WavRenderer } from '../utils/wav_renderer'
 
-import { X, Edit, Zap, ArrowUp, ArrowDown, Book, Search, Code } from 'react-feather'
+import { X, Zap, ArrowUp, ArrowDown} from 'react-feather'
 import { Button } from '../components/button/Button'
 import { Toggle } from '../components/toggle/Toggle'
 
 import './ConsolePage.scss'
-import { isJsxOpeningLikeElement } from 'typescript'
 
 /**
  * Type for result from get_weather() function call
@@ -221,7 +215,7 @@ export function ConsolePage() {
 
 
         if (client.getTurnDetectionType() === 'server_vad') {
-            //await wavRecorder.record((data) => client.appendInputAudio(data.mono))
+            await wavRecorder.record((data) => client.appendInputAudio(data.mono))
         }
     }, [])
 
@@ -268,10 +262,7 @@ export function ConsolePage() {
             const { trackId, offset } = trackSampleOffset
             await client.cancelResponse(trackId, offset)
         }
-        await wavRecorder.record((data) => {
-            const { mono, raw } = data;
-            client.realtime.sendRaw(mono)
-        });
+        await wavRecorder.record((data) => client.appendInputAudio(data.mono))
     }
 
     /**
@@ -282,10 +273,7 @@ export function ConsolePage() {
         const client = clientRef.current
         const wavRecorder = wavRecorderRef.current
         await wavRecorder.pause()
-        const audio = await wavRecorder.save()
-        client.realtime.sendRaw('DONE')
-        await wavRecorder.clear()
-        //client.createResponse()
+        client.createResponse()
     }
 
     /**
@@ -298,7 +286,7 @@ export function ConsolePage() {
             await wavRecorder.pause()
         }
         if (value === 'server_vad' && client.isConnected()) {
-            //await wavRecorder.record((data) => client.appendInputAudio(data.mono))
+            await wavRecorder.record((data) => client.appendInputAudio(data.mono))
         }
         setCanPushToTalk(value === 'none')
     }
