@@ -1,12 +1,13 @@
 services:
   segma-realtime-console:
-    image: segma-realtime-consoles
+    image: registry.gitlab.com/wavein/xinos-docker/segma-realtime-console:${VERSION:-latest}
     build:
       context: .
     environment:
       - OPENAI_API_KEY
-      - API_URL
-      - REACT_APP_AGENT_PORT=${AGENT_PORT:-3000}
+      - FLOWISE_API_URL
+      - FLOWISE_CHATFLOW_ID
+      - REACT_APP_BACKEND_PORT=${BACKEND_PORT:-3000}
     ports:
-      - ${AGENT_PORT:-3000}:8000
+      - ${BACKEND_PORT:-3000}:8000
       - ${FRONTEND_PORT:-3005}:3000
