@@ -216,10 +216,6 @@ export function ConsolePage() {
         const wavRecorder = wavRecorderRef.current
         const wavStreamPlayer = wavStreamPlayerRef.current
         const trackSampleOffset = await wavStreamPlayer.interrupt()
-        if (trackSampleOffset?.trackId) {
-            const { trackId, offset } = trackSampleOffset
-            await client.cancelResponse(trackId, offset)
-        }
         await wavRecorder.record((data) => client.appendInputAudio(data.mono))
     }
 
@@ -428,11 +424,6 @@ export function ConsolePage() {
             console.log('Conversation interrupted:', event)
             // 中断音频播放
             const trackSampleOffset = await wavStreamPlayer.interrupt()
-            if (trackSampleOffset?.trackId) {
-                const { trackId, offset } = trackSampleOffset
-                await client.cancelResponse(trackId, offset)
-            }
-
             // 更新 UI 显示
             setItems(client.conversation.getItems())
 
