@@ -1,0 +1,41 @@
+# 核心依赖
+websockets>=11.0.3
+openai>=1.6.0
+requests>=2.31.0
+urllib3>=2.0.7
+pydantic>=2.5.2
+python-dotenv>=1.0.0
+
+# 音频处理
+numpy>=1.24.0
+
+# VAD（语音活动检测）
+# 以下是可选的，取决于您是否使用本地 VAD
+torch>=2.0.0  # 仅在使用 LocalVADProvider 时需要
+silero-vad>=6.0.0
+
+# API 集成（可选，取决于您使用的提供商）
+anthropic>=0.21.0  # 仅在使用 AnthropicQueryProvider 时需要
+assemblyai>=0.18.0  # 仅在使用 AssemblyAISTTProvider 时需要
+groq>=0.4.0  # 仅在使用 GroqSTTProvider 时需要
+langchain>=0.1.0  # 仅在使用 LangChainQueryProvider 时需要
+langchain-openai>=0.1.0  # 仅在使用 LangChainQueryProvider 时需要
+google-generativeai>=0.3.0  # 仅在使用 GoogleAIQueryProvider 时需要
+requests-toolbelt>=1.0.0  # 用于多部分表单提交（如 Azure STT）
+
+# 测试工具
+pytest>=7.4.0
+pytest-asyncio>=0.21.1
+
+click
+jinja2
+networkx
+numpy
+pip
+pyparsing
+pytz
+pyyaml
+requests
+werkzeug
+wheel
+aiosqlite
