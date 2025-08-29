@@ -26,7 +26,8 @@ class SessionManager:
             "mode": "push_to_talk",
             "stt_provider": "openai",
             "stt_config": {
-                "model": "gpt-4o-transcribe"
+                "model": "gpt-4o-transcribe",
+                "prompt": get_config("STT_PROMPT"),
             },
             "tts_provider": "openai",
             "tts_config": {
@@ -38,7 +39,6 @@ class SessionManager:
             "query_config": {
                 "api_url": get_config("FLOWISE_API_URL"),
                 "api_key": get_config("FLOWISE_API_KEY"),
-                "chatflow_id": get_config("FLOWISE_CHATFLOW_ID", "")
             },
             "vad_config": {
                 "threshold": 0.5,

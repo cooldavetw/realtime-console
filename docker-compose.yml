@@ -6,8 +6,9 @@ services:
     environment:
       - OPENAI_API_KEY
       - FLOWISE_API_URL
-      - FLOWISE_CHATFLOW_ID
+      - FLOWISE_API_KEY
       - REACT_APP_BACKEND_PORT=${BACKEND_PORT:-3000}
+      - STT_PROMPT
     ports:
       - ${BACKEND_PORT:-3000}:8000
       - ${FRONTEND_PORT:-3005}:3000

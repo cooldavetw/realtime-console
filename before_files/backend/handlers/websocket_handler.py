@@ -39,29 +39,15 @@ class WebSocketHandler:
             await self.audio_handler.setup_vad_mode(websocket, session_id)
 
         try:
-            async for message in websocket:
-                # 处理文本消息（JSON 事件）
-                if isinstance(message, str):
-                    try:
-                        event = json.loads(message)
-                        await self.event_handler.process_event(websocket, event, session_id)
-                    except json.JSONDecodeError:
-                        await send_event(websocket, "error", {
-                            "code": "invalid_json",
-                            "message": "Invalid JSON format"
-                        })
-
-                # 处理二进制消息（音频数据）
-                elif isinstance(message, bytes):
-                    # 将二进制音频转换为 audio.chunk 事件
-                    await self.audio_handler.process_binary_audio(websocket, message, session_id)
-
-                else:
+            async for message in websocket:                
+                try:
+                    event = json.loads(message)
+                    await self.event_handler.process_event(websocket, event, session_id)
+                except json.JSONDecodeError:
                     await send_event(websocket, "error", {
-                        "code": "invalid_message_type",
-                        "message": f"Unsupported message type: {type(message)}"
+                        "code": "invalid_json",
+                        "message": "Invalid JSON format"
                     })
-
         except websockets.exceptions.ConnectionClosedError as e:
             logger.info(f"Client disconnected: {e}")
         except Exception as e:

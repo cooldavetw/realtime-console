@@ -14,7 +14,6 @@ class TTSConfig(BaseModel):
 class QueryConfig(BaseModel):
     api_url: Optional[str] = None
     api_key: Optional[str] = None
-    chatflow_id: Optional[str] = None
     override_config: Optional[Dict[str, Any]] = None
 
 class VADConfig(BaseModel):

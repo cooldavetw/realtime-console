@@ -17,18 +17,6 @@ class AudioHandler:
     def __init__(self, session_manager: SessionManager):
         self.session_manager = session_manager
 
-    async def process_binary_audio(self, websocket, audio_data, session_id):
-        """处理二进制音频数据"""
-        session = self.session_manager.get_session(session_id)
-
-        if session["config"]["mode"] == "push_to_talk":
-            # Push-to-talk 模式：累积音频数据
-            session["audio_buffer"].extend(audio_data)
-
-        elif session["config"]["mode"] == "vad":
-            # VAD 模式：转发到 OpenAI Realtime API
-            await self.forward_to_vad(websocket, audio_data, session_id)
-
     async def forward_to_vad(self, websocket, audio_data, session_id):
         """将音频转发到 VAD 服务"""
         session = self.session_manager.get_session(session_id)

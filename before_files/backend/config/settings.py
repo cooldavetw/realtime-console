@@ -10,8 +10,10 @@ def init_config():
     CONFIG.update({
         "FLOWISE_API_URL": os.getenv("FLOWISE_API_URL"),
         "FLOWISE_API_KEY": os.getenv("FLOWISE_API_KEY"),
-        "FLOWISE_CHATFLOW_ID": os.getenv("FLOWISE_CHATFLOW_ID"),
         "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
+
+        # STT配置
+        "STT_PROMPT": os.getenv("STT_PROMPT"),
 
         # 音频配置
         "PCM_SAMPLE_RATE": int(os.getenv("PCM_SAMPLE_RATE", "16000")),

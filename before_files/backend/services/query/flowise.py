@@ -19,7 +19,6 @@ class FlowiseQueryProvider:
             query_config = config.get("query_config", {})
             api_url = query_config.get("api_url", os.getenv("FLOWISE_API_URL"))
             api_key = query_config.get("api_key", os.getenv("FLOWISE_API_KEY"))
-            chatflow_id = query_config.get("chatflow_id", os.getenv("FLOWISE_CHATFLOW_ID", ""))
 
             # 构建查询负载
             payload = {
@@ -36,27 +35,18 @@ class FlowiseQueryProvider:
             if override_config:
                 payload["overrideConfig"] = override_config
 
-            # 构建URL
-            url = api_url
-            if chatflow_id:
-                if not url.endswith("/"):
-                    url += "/"
-                if "prediction" not in url:
-                    url += "api/v1/prediction/"
-                url += chatflow_id
-
             # 构建请求头
             headers = {"Content-Type": "application/json"}
             if api_key:
                 headers["Authorization"] = f"Bearer {api_key}"
 
             # 记录请求
-            logger.info(f"Sending Flowise query to {url}: {json.dumps(payload, indent=2)}")
+            logger.info(f"Sending Flowise query to {api_url}: {json.dumps(payload, indent=2)}")
 
             # 发送请求
             import time
             start_time = time.time()
-            r = requests.post(url, json=payload, headers=headers, verify=False, timeout=30)
+            r = requests.post(api_url, json=payload, headers=headers, verify=False, timeout=30)
             elapsed_time = time.time() - start_time
 
             # 请求失败

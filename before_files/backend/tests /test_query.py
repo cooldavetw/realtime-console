@@ -26,7 +26,6 @@ class TestQuery(unittest.TestCase):
             "query_config": {
                 "api_url": os.getenv("FLOWISE_API_URL"),
                 "api_key": os.getenv("FLOWISE_API_KEY"),
-                "chatflow_id": os.getenv("FLOWISE_CHATFLOW_ID", "")
             }
         }
 
