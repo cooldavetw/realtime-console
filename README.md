@@ -95,8 +95,10 @@ active sessions are held in memory. For persistent operation, run this command
 through a process manager such as systemd with the repository as its working
 directory and the virtual environment's Uvicorn executable.
 
-The browser connects to `/ws` on the same host, selecting `wss` automatically
-for HTTPS. Remote microphone access requires HTTPS; localhost supports local
+Frontend assets and the WebSocket URL resolve relative to the page directory,
+so the same build works at `/` or behind a proxy prefix. Open the app using
+its trailing-slash URL or `index.html` (for example, `/prefix/index.html`).
+The browser connects to `ws` within that directory, selecting `wss` for HTTPS. Remote microphone access requires HTTPS; localhost supports local
 development. An HTTPS reverse proxy must forward WebSocket upgrades to `/ws`.
 `GET /health` returns application health. Before the frontend is built, `/`
 returns a 503 response with build instructions.

@@ -10,9 +10,12 @@ export class RealtimeAPI extends RealtimeEventHandler {
   constructor({ url, debug } = {}) {
     super();
     const location = globalThis.location;
-    this.defaultUrl = process.env.REACT_APP_WS_URL || (location
-      ? `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`
-      : 'ws://localhost:8000/ws');
+    const websocketUrl = new URL(
+      'ws',
+      globalThis.document?.baseURI || location?.href || 'http://localhost:8000/',
+    );
+    websocketUrl.protocol = websocketUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+    this.defaultUrl = process.env.REACT_APP_WS_URL || websocketUrl.href;
     this.url = url || this.defaultUrl;
     this.debug = !!debug;
     this.ws = null;
