@@ -4,7 +4,6 @@ from pathlib import Path
 
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
 
 from backend.config.settings import PROJECT_ROOT, get_config, init_config
 from backend.config.logging_config import setup_logging
@@ -36,7 +35,7 @@ def create_app(frontend_dir: Path = None) -> FastAPI:
         await app.state.websocket_handler.handle_client(websocket)
 
     if (build_dir / "index.html").is_file():
-        app.mount("/", StaticFiles(directory=build_dir, html=True), name="frontend")
+        app.frontend("/", directory=build_dir, fallback="index.html")
     else:
         @app.get("/")
         async def frontend_missing():

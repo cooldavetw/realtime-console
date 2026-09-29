@@ -3,6 +3,9 @@
 A React voice console with a Python FastAPI backend for streaming audio,
 transcription, and AI conversations. FastAPI serves the compiled frontend and
 WebSocket API together on one port. Docker is not required.
+The compiled frontend is served with FastAPI `app.frontend()` and an
+`index.html` fallback for client-side browser navigation. This serves existing
+build files; it does not run npm or rebuild frontend source automatically.
 
 ## Layout
 

@@ -28,6 +28,10 @@ def test_static_hosting_and_route_precedence(app_factory, tmp_path):
         assert client.get("/").text == "<html>Console</html>"
         assert client.get("/app.js").status_code == 200
         assert client.get("/missing.js").status_code == 404
+        navigation = client.get("/conversation/example", headers={"Accept": "text/html"})
+        assert navigation.status_code == 200
+        assert navigation.text == "<html>Console</html>"
+        assert client.get("/conversation/example", headers={"Accept": "application/json"}).status_code == 404
         assert client.get("/health").json() == {"status": "ok"}
         with client.websocket_connect("/ws") as ws:
             assert ws.receive_json()["type"] == "session.created"
