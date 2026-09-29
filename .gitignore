@@ -86,5 +86,6 @@ __pycache__/
 .pytest_cache/
 frontend/node_modules/
 frontend/build/
+frontend/dist/
 data/*.db*
 logs/

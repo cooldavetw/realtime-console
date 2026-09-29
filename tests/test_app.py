@@ -20,7 +20,7 @@ def app_factory(tmp_path, monkeypatch):
 
 def test_static_hosting_and_route_precedence(app_factory, tmp_path):
     create_app, _ = app_factory
-    build = tmp_path / "build"
+    build = tmp_path / "dist"
     build.mkdir()
     (build / "index.html").write_text("<html>Console</html>")
     (build / "app.js").write_text("console.log('console');")

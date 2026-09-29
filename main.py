@@ -11,7 +11,7 @@ from backend.handlers.websocket_handler import WebSocketHandler
 
 
 def create_app(frontend_dir: Path = None) -> FastAPI:
-    build_dir = Path(frontend_dir) if frontend_dir is not None else PROJECT_ROOT / "frontend" / "build"
+    build_dir = Path(frontend_dir) if frontend_dir is not None else PROJECT_ROOT / "frontend" / "dist"
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):

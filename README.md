@@ -6,6 +6,8 @@ WebSocket API together on one port. Docker is not required.
 The compiled frontend is served with FastAPI `app.frontend()` and an
 `index.html` fallback for client-side browser navigation. This serves existing
 build files; it does not run npm or rebuild frontend source automatically.
+`npm run build` writes to `frontend/dist/`, matching the container frontend
+builder's default output directory.
 
 ## Layout
 
