@@ -5,6 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import main
+from fastapi import FastAPI
 from backend.core.conversation_store import ConversationStore
 
 
@@ -42,6 +43,27 @@ def test_missing_frontend_keeps_api_available(app_factory, tmp_path):
     with TestClient(create_app(tmp_path / "missing")) as client:
         assert client.get("/").status_code == 503
         assert client.get("/health").status_code == 200
+
+
+def test_mounted_frontend_redirect_preserves_prefix_and_query(app_factory, tmp_path):
+    create_app, _ = app_factory
+    build = tmp_path / "dist"
+    build.mkdir()
+    (build / "index.html").write_text("<html>Console</html>")
+    parent = FastAPI()
+    parent.mount("/hook/my-app", create_app(build))
+    with TestClient(parent) as client:
+        response = client.get("/hook/my-app?mode=voice", follow_redirects=False)
+        assert response.status_code == 307
+        assert response.headers["location"].endswith("/hook/my-app/?mode=voice")
+        assert client.get("/hook/my-app/").text == "<html>Console</html>"
+        assert client.get("/hook/my-app/health").json() == {"status": "ok"}
+    # Exercise our middleware directly when the hook forwards without redirecting.
+    with TestClient(create_app(build), root_path="/hook/my-app") as client:
+        response = client.get("/hook/my-app?mode=voice", follow_redirects=False)
+        assert response.status_code == 307
+        assert response.headers["location"] == "/hook/my-app/?mode=voice"
+        assert client.get("/hook/my-app/").text == "<html>Console</html>"
 
 
 def test_websocket_events_and_disconnect_cleanup(app_factory, tmp_path):
