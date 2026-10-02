@@ -26,7 +26,7 @@ export class RealtimeAPI extends RealtimeEventHandler {
    * @returns {boolean}
    */
   isConnected() {
-    return !!this.ws;
+    return this.ws?.readyState === 1;
   }
 
   /**
@@ -79,14 +79,20 @@ export class RealtimeAPI extends RealtimeEventHandler {
           }
       });
       return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => connectionErrorHandler(), 15000);
         const connectionErrorHandler = () => {
+          clearTimeout(timeout);
+          ws.close();
           this.disconnect(ws);
           reject(new Error(`Could not connect to "${this.url}"`));
         };
         ws.addEventListener('error', connectionErrorHandler);
+        ws.addEventListener('close', connectionErrorHandler, { once: true });
         ws.addEventListener('open', () => {
+          clearTimeout(timeout);
           this.log(`Connected to "${this.url}"`);
           ws.removeEventListener('error', connectionErrorHandler);
+          ws.removeEventListener('close', connectionErrorHandler);
           ws.addEventListener('error', () => {
             this.disconnect(ws);
             this.log(`Error, disconnected from "${this.url}"`);
@@ -128,14 +134,20 @@ export class RealtimeAPI extends RealtimeEventHandler {
 
       });
       return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => connectionErrorHandler(), 15000);
         const connectionErrorHandler = () => {
+          clearTimeout(timeout);
+          ws.close();
           this.disconnect(ws);
           reject(new Error(`Could not connect to "${this.url}"`));
         };
         ws.on('error', connectionErrorHandler);
+        ws.once('close', connectionErrorHandler);
         ws.on('open', () => {
+          clearTimeout(timeout);
           this.log(`Connected to "${this.url}"`);
           ws.removeListener('error', connectionErrorHandler);
+          ws.removeListener('close', connectionErrorHandler);
           ws.on('error', () => {
             this.disconnect(ws);
             this.log(`Error, disconnected from "${this.url}"`);

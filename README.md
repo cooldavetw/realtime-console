@@ -107,6 +107,23 @@ SQLite data and logs resolve relative to the repository rather than the shell's
 working directory. Conversation records are deleted when a session disconnects,
 preserving the existing session lifecycle.
 
+## Container connection troubleshooting
+
+An HTTP LAN address such as `http://192.168.66.25` is not a secure browser
+context. Microphone capture and AudioWorklet playback require HTTPS (localhost
+is exempt). The console supports text chat on HTTP and displays a voice warning;
+serve it over HTTPS with a browser-trusted certificate to enable voice.
+
+When opening a Segma `/hook/` URL, add the page origin (scheme, hostname, and
+port, without a path) to that hook's **Websites allowed to call it from a browser**.
+For example, HTTP LAN testing requires `http://192.168.66.25`. WebSocket
+handshakes are subject to this list too; they cannot rely on the page's Referer
+to qualify for the middleware's same-hook exemption. Update the entry when
+switching to HTTPS. A refused handshake appears as a connection error.
+
+After updating frontend source, run `npm run build` in `frontend/` and deploy
+that build to the container, then reload the browser.
+
 ## Development
 
 Run the backend with automatic reload:

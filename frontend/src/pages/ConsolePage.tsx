@@ -101,6 +101,10 @@ export function ConsolePage() {
         [key: string]: boolean;
     }>({})
     const [isConnected, setIsConnected] = useState(false)
+    const [isConnecting, setIsConnecting] = useState(false)
+    const [connectionError, setConnectionError] = useState('')
+    const [textQuery, setTextQuery] = useState('')
+    const voiceAvailable = window.isSecureContext && !!navigator.mediaDevices?.getUserMedia
     const [canPushToTalk, setCanPushToTalk] = useState(true)
     const [isRecording, setIsRecording] = useState(false)
     const [memoryKv, setMemoryKv] = useState<{ [key: string]: any }>({})
@@ -142,25 +146,31 @@ export function ConsolePage() {
         const wavRecorder = wavRecorderRef.current
         const wavStreamPlayer = wavStreamPlayerRef.current
 
-        // Set state variables
+        setIsConnecting(true)
+        setConnectionError('')
         startTimeRef.current = new Date().toISOString()
-        setIsConnected(true)
         setRealtimeEvents([])
         setItems(client.conversation.getItems())
-
-        // Connect to microphone
-        await wavRecorder.begin()
-
-        // Connect to audio output
-        await wavStreamPlayer.connect()
-
-        // Connect to realtime API
-        await client.connect()
-
-        if (client.getTurnDetectionType() === 'vad') {
-            await wavRecorder.record((data) => client.appendInputAudio(data.mono))
+        try {
+            if (voiceAvailable) {
+                await wavRecorder.begin()
+                await wavStreamPlayer.connect()
+            }
+            await client.connect()
+            if (voiceAvailable && client.getTurnDetectionType() === 'vad') {
+                await wavRecorder.record((data) => client.appendInputAudio(data.mono))
+            }
+            setIsConnected(true)
+        } catch (error) {
+            client.disconnect()
+            setIsConnected(false)
+            setConnectionError(error instanceof Error ? error.message : String(error))
+            await wavRecorder.end().catch(() => {})
+            wavStreamPlayer.interrupt()
+        } finally {
+            setIsConnecting(false)
         }
-    }, [])
+    }, [voiceAvailable])
 
     /**
      * Disconnect and reset conversation state
@@ -180,7 +190,7 @@ export function ConsolePage() {
         client.disconnect()
 
         const wavRecorder = wavRecorderRef.current
-        await wavRecorder.end()
+        if (wavRecorder.getStatus() !== 'ended') await wavRecorder.end()
 
         const wavStreamPlayer = wavStreamPlayerRef.current
         await wavStreamPlayer.interrupt()
@@ -423,7 +433,7 @@ export function ConsolePage() {
 
         client.on("response.created", async (event: any) => {
             console.log('Response created:', event)
-            if (event.audio) {
+            if (event.audio && wavStreamPlayer.context?.audioWorklet) {
                 // 播放助手的音频回复
                 const audioData = event.audio
                     ? event.audio instanceof Int16Array
@@ -487,6 +497,8 @@ export function ConsolePage() {
                     <span>realtime console</span>
                 </div>
             </div>
+            {!voiceAvailable && <p role="status">Voice requires HTTPS or localhost. You can connect and use text chat here.</p>}
+            {connectionError && <p role="alert">Connection failed: {connectionError}</p>}
             <div className="content-main">
                 <div className="content-logs">
                     <div className="content-block events">
@@ -500,7 +512,7 @@ export function ConsolePage() {
                         </div>
                         <div className="content-block-title">events</div>
                         <div className="content-block-body" ref={eventsScrollRef}>
-                            {!realtimeEvents.length && `awaiting connection...`}
+                            {!realtimeEvents.length && (isConnecting ? 'connecting…' : isConnected ? 'connected; waiting for events…' : 'awaiting connection…')}
                             {realtimeEvents.map((realtimeEvent, i) => {
                                 const count = realtimeEvent.count
                                 const event = { ...realtimeEvent.event }
@@ -561,7 +573,7 @@ export function ConsolePage() {
                     <div className="content-block conversation">
                         <div className="content-block-title">conversation</div>
                         <div className="content-block-body" data-conversation-content>
-                            {!items.length && `awaiting connection...`}
+                            {!items.length && (isConnecting ? 'connecting…' : isConnected ? 'connected; ready for conversation' : 'awaiting connection…')}
                             {items.map((conversationItem, i) => {
                                 return (
                                     <div className={`conversation-item ${conversationItem.status || ''}`} key={conversationItem.id}>
@@ -611,8 +623,19 @@ export function ConsolePage() {
                             })}
                         </div>
                     </div>
+                    <form onSubmit={(event) => {
+                        event.preventDefault()
+                        if (!isConnected || !textQuery.trim()) return
+                        clientRef.current.sendTextQuery(textQuery.trim())
+                        setTextQuery('')
+                    }}>
+                        <input aria-label="Message" value={textQuery}
+                            onChange={(event) => setTextQuery(event.target.value)}
+                            disabled={!isConnected} placeholder="Type a message" />
+                        <button type="submit" disabled={!isConnected || !textQuery.trim()}>Send</button>
+                    </form>
                     <div className="content-actions">
-                        {isConnected && (
+                        {isConnected && voiceAvailable && (
                             <Toggle
                                 defaultValue={false}
                                 labels={['manual', 'vad']}
@@ -621,7 +644,7 @@ export function ConsolePage() {
                             />
                         )}
                         <div className="spacer" />
-                        {isConnected && canPushToTalk && (
+                        {isConnected && voiceAvailable && canPushToTalk && (
                             <Button
                                 label={isRecording ? 'release to send' : 'push to talk'}
                                 buttonStyle={isRecording ? 'alert' : 'regular'}
@@ -632,7 +655,8 @@ export function ConsolePage() {
                         )}
                         <div className="spacer" />
                         <Button
-                            label={isConnected ? 'disconnect' : 'connect'}
+                            disabled={isConnecting}
+                            label={isConnecting ? 'connecting…' : isConnected ? 'disconnect' : 'connect'}
                             iconPosition={isConnected ? 'end' : 'start'}
                             icon={isConnected ? X : Zap}
                             buttonStyle={isConnected ? 'regular' : 'action'}

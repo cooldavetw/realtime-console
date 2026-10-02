@@ -150,9 +150,15 @@ export class RealtimeClient extends RealtimeEventHandler {
         if (this.isConnected()) {
             throw new Error('Already connected to the server. Please disconnect first.');
         }
-        await this.realtime.connect();
-        this.realtime.send('session.create', { config: this.sessionConfig });
-        await this.waitForSessionCreated();
+        this.sessionCreated = false;
+        try {
+            await this.realtime.connect();
+            this.realtime.send('session.create', { config: this.sessionConfig });
+            await this.waitForSessionCreated();
+        } catch (error) {
+            this.disconnect();
+            throw error;
+        }
         return true;
     }
 
@@ -161,7 +167,14 @@ export class RealtimeClient extends RealtimeEventHandler {
      * @returns {Promise<boolean>}
      */
     async waitForSessionCreated() {
+        const started = Date.now();
         while (!this.sessionCreated) {
+            if (!this.isConnected()) {
+                throw new Error('Connection closed before the server created a session.');
+            }
+            if (Date.now() - started >= 15000) {
+                throw new Error(`WebSocket connected to "${this.realtime.url}", but the server did not send session.created within 15 seconds.`);
+            }
             await new Promise((resolve) => setTimeout(resolve, 100));
         }
         return true;
