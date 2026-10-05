@@ -33,11 +33,5 @@ class VADProvider(ABC):
         if provider == "openai":
             from backend.services.vad.openai_vad import OpenAIVADProvider
             return OpenAIVADProvider
-        elif provider == "local":
-            from backend.services.vad.local_vad import LocalVADProvider
-            return LocalVADProvider
-        elif provider == "silero":
-            from backend.services.vad.silero_vad import SileroVADProvider
-            return SileroVADProvider
         else:
             raise ValueError(f"Unknown VAD provider: {provider}")

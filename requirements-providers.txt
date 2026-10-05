@@ -1,0 +1,9 @@
+# SDKs for optional providers, imported only when that provider is selected.
+# Install the ones you use, or all of them: pip install -r requirements-providers.txt
+anthropic>=0.21.0          # QUERY_PROVIDER=anthropic
+langchain>=0.1.0           # QUERY_PROVIDER=langchain
+langchain-openai>=0.1.0    # QUERY_PROVIDER=langchain
+google-generativeai>=0.3.0 # QUERY_PROVIDER=google_ai
+assemblyai>=0.18.0         # stt_provider assemblyai
+groq>=0.4.0                # stt_provider groq
+requests-toolbelt>=1.0.0   # stt_provider azure

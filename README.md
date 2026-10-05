@@ -16,7 +16,7 @@ main.py             FastAPI application and startup entry point
 backend/            Configuration, sessions, event handlers, and AI providers
 frontend/           React source and production build
 tests/             Backend and application tests
-requirements.txt    Python dependencies
+requirements*.txt   Python dependencies: runtime, optional providers, tests
 .env.example        Example runtime configuration
 data/               SQLite database (created automatically)
 logs/               Application logs (created automatically)
@@ -60,6 +60,10 @@ The implementation is in `backend/services/query/pydantic_ai_agent.py`.
 Register Python tools on its `Agent` to extend it. Existing Flowise tools,
 retrieval sources, and workflow branches are not imported automatically;
 this repository does not contain the original chatflow definition.
+
+Optional providers need their SDKs from `requirements-providers.txt`, which
+notes the provider each one is for. Install only the ones you use; the default
+pipeline needs none of them.
 
 To use the existing Flowise integration instead, set `QUERY_PROVIDER=flowise`,
 `FLOWISE_API_URL` to the chatflow prediction URL, and `FLOWISE_API_KEY` if
@@ -145,7 +149,8 @@ override; production builds normally use the same host as the page.
 ## Tests
 
 ```bash
-python -m pytesttests/test_app.py
+pip install -r requirements-dev.txt
+python -m pytest tests/test_app.py tests/test_pydantic_ai_agent.py
 ```
 
 The other tests exercise external providers and require the corresponding API
