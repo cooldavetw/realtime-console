@@ -2,8 +2,8 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Request, WebSocket
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi import FastAPI, WebSocket
+from fastapi.responses import JSONResponse
 
 from backend.config.settings import PROJECT_ROOT, get_config, init_config
 from backend.config.logging_config import setup_logging
@@ -24,19 +24,6 @@ def create_app(frontend_dir: Path = None) -> FastAPI:
             manager.delete_session(session_id)
 
     app = FastAPI(title="Segma Realtime Console", lifespan=lifespan)
-
-    @app.middleware("http")
-    async def redirect_frontend_root(request: Request, call_next):
-        # Mounted apps retain their external prefix in ASGI root_path.
-        root_path = request.scope.get("root_path", "").rstrip("/")
-        if root_path and request.scope["path"] == root_path:
-            target = request.url.replace(path=request.url.path + "/")
-            # A relative Location preserves the public HTTPS origin behind a proxy.
-            location = target.path
-            if target.query:
-                location += "?" + target.query
-            return RedirectResponse(location, status_code=307)
-        return await call_next(request)
 
     @app.get("/health")
     async def health():

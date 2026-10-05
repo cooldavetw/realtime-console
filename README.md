@@ -98,12 +98,6 @@ directory and the virtual environment's Uvicorn executable.
 Frontend assets and the WebSocket URL resolve relative to the page directory,
 so the same build works at `/` or behind a proxy prefix. Open the app using
 its trailing-slash URL or `index.html` (for example, `/prefix/index.html`).
-When mounted with an ASGI `root_path`, the application redirects the mount's
-bare URL to its trailing-slash URL, preserving query parameters. If a proxy
-strips the prefix and forwards both URLs as `/`, configure the redirect at
-that proxy instead: the backend cannot distinguish those requests. For a
-standalone deployment behind a prefix-stripping proxy, configure Uvicorn's
-`--root-path /prefix` to describe the external mount prefix.
 The browser connects to `ws` within that directory, selecting `wss` for HTTPS. Remote microphone access requires HTTPS; localhost supports local
 development. An HTTPS reverse proxy must forward WebSocket upgrades to `/ws`.
 `GET /health` returns application health. Before the frontend is built, `/`
